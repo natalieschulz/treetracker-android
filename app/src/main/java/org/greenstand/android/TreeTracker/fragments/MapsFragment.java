@@ -2,12 +2,15 @@ package org.greenstand.android.TreeTracker.fragments;
 
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -48,7 +51,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class MapsFragment extends Fragment implements OnClickListener, OnMarkerClickListener, OnMapReadyCallback {
+public class MapsFragment extends Fragment
+        implements OnClickListener, OnMarkerClickListener, OnMapReadyCallback, View.OnLongClickListener {
     private static final String TAG = "MapsFragment";
 
     public interface LocationDialogListener {
@@ -205,6 +209,8 @@ public class MapsFragment extends Fragment implements OnClickListener, OnMarkerC
         FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
+        fab.setOnLongClickListener(this);
+
 		((SupportMapFragment) getChildFragmentManager()
 				.findFragmentById(R.id.map)).getMapAsync(this);
 
@@ -215,17 +221,13 @@ public class MapsFragment extends Fragment implements OnClickListener, OnMarkerC
 		int minAccuracy = mSharedPreferences.getInt(ValueHelper.MIN_ACCURACY_GLOBAL_SETTING, ValueHelper.MIN_ACCURACY_DEFAULT_SETTING);
 
 		if (mapGpsAccuracy != null) {
-			Log.i("ođe", "0");
 			if (MainActivity.mCurrentLocation != null) {
-				Log.i("ođe", "1");
 				if (MainActivity.mCurrentLocation.hasAccuracy() && (MainActivity.mCurrentLocation.getAccuracy() < minAccuracy)) {
-					Log.i("ođe", "2");
 					mapGpsAccuracy.setTextColor(Color.GREEN);
 					mapGpsAccuracyValue.setTextColor(Color.GREEN);
 					mapGpsAccuracyValue.setText(Integer.toString(Math.round(MainActivity.mCurrentLocation.getAccuracy())) + " " + getResources().getString(R.string.meters));
 					MainActivity.mAllowNewTreeOrUpdate = true;
 				} else {
-					Log.i("ođe", "3");
 					mapGpsAccuracy.setTextColor(Color.RED);
 					MainActivity.mAllowNewTreeOrUpdate = false;
 
@@ -343,6 +345,51 @@ public class MapsFragment extends Fragment implements OnClickListener, OnMarkerC
 
 
 	}
+
+  // For debug analysis purposes only
+  @Override
+  public boolean onLongClick(View view) {
+
+	    if(MainActivity.mCurrentLocation == null){
+	        return true;
+        }
+
+    Toast.makeText(getActivity(), "Adding lot of trees", Toast.LENGTH_LONG).show();
+
+
+    // programmatically add 500 trees, for analysis only
+    // this is on the main thread for ease, in Kotlin just make a Coroutine
+    SQLiteDatabase dbw = MainActivity.dbHelper.getWritableDatabase();
+
+    int userId = -1;
+
+    for(int i=0; i<500; i++) {
+
+      ContentValues locationContentValues = new ContentValues();
+      locationContentValues.put("accuracy",
+          Float.toString(MainActivity.mCurrentLocation.getAccuracy()));
+      locationContentValues.put("lat",
+          Double.toString(MainActivity.mCurrentLocation.getLatitude() + (Math.random() - .5) / 1000));
+      locationContentValues.put("long",
+          Double.toString(MainActivity.mCurrentLocation.getLongitude() + (Math.random() - .5) / 1000));
+      locationContentValues.put("user_id", userId);
+
+      long locationId = dbw.insert("location", null, locationContentValues);
+
+      ContentValues treeContentValues = new ContentValues();
+      treeContentValues.put("user_id", userId);
+      treeContentValues.put("location_id", locationId);
+      SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      treeContentValues.put("time_created", dateFormat.format(new Date()));
+      treeContentValues.put("time_updated", dateFormat.format(new Date()));
+
+      long treeId = dbw.insert("tree", null, treeContentValues);
+    }
+
+    Toast.makeText(getActivity(), "Lots of trees added", Toast.LENGTH_LONG).show();
+
+    return true;
+  }
 
 	public boolean onMarkerClick(Marker marker) {
 		fragment = new TreePreviewFragment();
