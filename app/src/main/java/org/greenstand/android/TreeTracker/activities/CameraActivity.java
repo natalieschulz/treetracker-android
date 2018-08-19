@@ -2,6 +2,7 @@ package org.greenstand.android.TreeTracker.activities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -30,6 +31,7 @@ import org.greenstand.android.TreeTracker.camera.AlbumStorageDirFactory;
 import org.greenstand.android.TreeTracker.camera.BaseAlbumDirFactory;
 import org.greenstand.android.TreeTracker.camera.CameraPreview;
 import org.greenstand.android.TreeTracker.camera.FroyoAlbumDirFactory;
+import org.greenstand.android.TreeTracker.utilities.TreeImage;
 import org.greenstand.android.TreeTracker.utilities.Utils;
 import org.greenstand.android.TreeTracker.utilities.ValueHelper;
 
@@ -251,12 +253,13 @@ public class CameraActivity extends Activity implements PictureCallback, OnClick
 		String imageFileName = ValueHelper.JPEG_FILE_PREFIX + timeStamp + "_";
 		File albumF = getAlbumDir();
 		File imageF = File.createTempFile(imageFileName,ValueHelper.JPEG_FILE_SUFFIX, albumF);
-
 		return imageF;
-	}
+  }
+
 	
 	private File setUpPhotoFile() throws IOException {
-		File f = createImageFile();
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        File f = TreeImage.createImageFile(cw);
 		mCurrentPhotoPath = f.getAbsolutePath();
 
 		return f;
