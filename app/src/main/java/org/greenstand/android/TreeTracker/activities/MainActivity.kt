@@ -29,7 +29,6 @@ import android.widget.TextView
 import android.widget.Toast
 
 import org.greenstand.android.TreeTracker.R
-import org.greenstand.android.TreeTracker.api.Api
 import org.greenstand.android.TreeTracker.managers.DataManager
 import org.greenstand.android.TreeTracker.api.models.responses.UserTree
 import org.greenstand.android.TreeTracker.application.Permissions
@@ -113,26 +112,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
             fragmentTransaction.commit()
 
-        }
-
-        val userIdentifier = mSharedPreferences!!.getString(ValueHelper.PLANTER_IDENTIFIER, null)
-        if(  userIdentifier == null){
-            val editor = mSharedPreferences!!.edit()
-            editor.putLong(ValueHelper.TIME_OF_LAST_USER_IDENTIFICATION, 0)
-            editor.putString(ValueHelper.PLANTER_IDENTIFIER, null)
-            editor.putString(ValueHelper.PLANTER_PHOTO, null)
-            editor.commit()
-
-            (findViewById(R.id.toolbar_title) as TextView).text = resources.getString(R.string.user_not_identified)
-
-
-            fragment = UserIdentificationFragment()
-            fragmentTransaction = supportFragmentManager
-                    .beginTransaction()
-            fragmentTransaction!!.replace(R.id.container_fragment, fragment as UserIdentificationFragment)
-                    .addToBackStack(ValueHelper.IDENTIFY_FRAGMENT).commit()
-
-        }else if (mSharedPreferences!!.getBoolean(ValueHelper.TREES_TO_BE_DOWNLOADED_FIRST, false)) {
+        } else if (mSharedPreferences!!.getBoolean(ValueHelper.TREES_TO_BE_DOWNLOADED_FIRST, false)) {
             Timber.d("TREES_TO_BE_DOWNLOADED_FIRST is true")
             var bundle = intent.extras
 
@@ -141,7 +121,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
             fragmentTransaction = supportFragmentManager
                     .beginTransaction()
-            fragmentTransaction!!.replace(R.id.container_fragment, fragment as MapsFragment).addToBackStack(ValueHelper.MAP_FRAGMENT).commit()
+            fragmentTransaction!!.replace(R.id.container_fragment, fragment).addToBackStack(ValueHelper.MAP_FRAGMENT).commit()
 
             if (bundle == null)
                 bundle = Bundle()
@@ -154,35 +134,20 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
             fragmentTransaction = supportFragmentManager
                     .beginTransaction()
-            fragmentTransaction!!.replace(R.id.container_fragment, fragment as DataFragment).addToBackStack(ValueHelper.DATA_FRAGMENT).commit()
+            fragmentTransaction!!.replace(R.id.container_fragment, fragment).addToBackStack(ValueHelper.DATA_FRAGMENT).commit()
 
         } else {
-            if (userIdentifier != getString(R.string.user_not_identified)) {
-                Timber.d("MainActivity" + " startDataSync is false")
-                val homeFragment = MapsFragment()
-                homeFragment.arguments = intent.extras
+            Timber.d("MainActivity" + " startDataSync is false")
+            val homeFragment = MapsFragment()
+            homeFragment.arguments = intent.extras
 
-                val fragmentTransaction = supportFragmentManager
-                        .beginTransaction()
-                fragmentTransaction.replace(R.id.container_fragment, homeFragment).addToBackStack(ValueHelper.MAP_FRAGMENT)
-                fragmentTransaction.commit()
-            }else {
-                val editor = mSharedPreferences!!.edit()
-                editor.putLong(ValueHelper.TIME_OF_LAST_USER_IDENTIFICATION, 0)
-                editor.putString(ValueHelper.PLANTER_IDENTIFIER, null)
-                editor.putString(ValueHelper.PLANTER_PHOTO, null)
-                editor.commit()
-
-                (findViewById(R.id.toolbar_title) as TextView).text = resources.getString(R.string.user_not_identified)
-
-
-                fragment = UserIdentificationFragment()
-                fragmentTransaction = supportFragmentManager
-                        .beginTransaction()
-                fragmentTransaction!!.replace(R.id.container_fragment,
-                        fragment as UserIdentificationFragment).addToBackStack(ValueHelper.IDENTIFY_FRAGMENT).commit()
-            }
+            val fragmentTransaction = supportFragmentManager
+                    .beginTransaction()
+            fragmentTransaction.replace(R.id.container_fragment, homeFragment).addToBackStack(ValueHelper.MAP_FRAGMENT)
+            fragmentTransaction.commit()
         }
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -207,7 +172,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                 fragment!!.arguments = bundle
 
                 fragmentTransaction = supportFragmentManager.beginTransaction()
-                fragmentTransaction!!.replace(R.id.container_fragment, fragment as DataFragment).addToBackStack(ValueHelper.DATA_FRAGMENT).commit()
+                fragmentTransaction!!.replace(R.id.container_fragment, fragment).addToBackStack(ValueHelper.DATA_FRAGMENT).commit()
                 for (entry in 0 until fm.backStackEntryCount) {
                     Timber.d("MainActivity " + "Found fragment: " + fm.getBackStackEntryAt(entry).name)
                 }
@@ -243,7 +208,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
                     fragmentTransaction = supportFragmentManager
                             .beginTransaction()
-                    fragmentTransaction!!.replace(R.id.container_fragment, fragment as AboutFragment).addToBackStack(ValueHelper.ABOUT_FRAGMENT).commit()
+                    fragmentTransaction!!.replace(R.id.container_fragment, fragment).addToBackStack(ValueHelper.ABOUT_FRAGMENT).commit()
                 }
                 for (entry in 0 until fm.backStackEntryCount) {
                     Timber.d("MainActivity " + "Found fragment: " + fm.getBackStackEntryAt(entry).name)
@@ -264,7 +229,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                 fragment = UserIdentificationFragment()
                 fragmentTransaction = supportFragmentManager
                         .beginTransaction()
-                fragmentTransaction!!.replace(R.id.container_fragment, fragment as UserIdentificationFragment).addToBackStack(ValueHelper.IDENTIFY_FRAGMENT).commit()
+                fragmentTransaction!!.replace(R.id.container_fragment, fragment).addToBackStack(ValueHelper.IDENTIFY_FRAGMENT).commit()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -545,7 +510,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
                     fragmentTransaction = supportFragmentManager
                             .beginTransaction()
-                    fragmentTransaction!!.replace(R.id.container_fragment, fragment as DataFragment).addToBackStack(ValueHelper.DATA_FRAGMENT).commit()
+                    fragmentTransaction!!.replace(R.id.container_fragment, fragment).addToBackStack(ValueHelper.DATA_FRAGMENT).commit()
 
                 }
             }

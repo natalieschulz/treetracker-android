@@ -60,16 +60,17 @@ class TreePreviewFragment : Fragment(), OnClickListener {
         menu!!.clear()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
 
-        val v = inflater.inflate(R.layout.fragment_tree_preview, container, false)
+        val v = inflater!!.inflate(R.layout.fragment_tree_preview, container, false)
 
-        (activity!!.findViewById(R.id.toolbar_title) as TextView).setText(R.string.tree_preview)
+        (activity.findViewById(R.id.toolbar_title) as TextView).setText(R.string.tree_preview)
         (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         val extras = arguments
 
-        treeIdStr = extras!!.getString(ValueHelper.TREE_ID)
+        treeIdStr = extras.getString(ValueHelper.TREE_ID)
 
         mImageView = v.findViewById(R.id.fragment_tree_preview_image) as ImageView
 
@@ -189,7 +190,7 @@ class TreePreviewFragment : Fragment(), OnClickListener {
             R.id.fragment_tree_preview_more -> {
                 fragment = NoteFragment()
 
-                bundle = activity!!.intent.extras
+                bundle = activity.intent.extras
 
                 if (bundle == null)
                     bundle = Bundle()
@@ -197,9 +198,9 @@ class TreePreviewFragment : Fragment(), OnClickListener {
                 bundle!!.putString(ValueHelper.TREE_ID, treeIdStr)
                 fragment!!.arguments = bundle
 
-                fragmentTransaction = activity!!.supportFragmentManager
+                fragmentTransaction = activity.supportFragmentManager
                         .beginTransaction()
-                fragmentTransaction!!.replace(R.id.container_fragment, fragment as NoteFragment)
+                fragmentTransaction!!.replace(R.id.container_fragment, fragment)
                         .addToBackStack(ValueHelper.NOTE_FRAGMENT).commit()
             }
 
